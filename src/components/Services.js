@@ -2,26 +2,66 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { motion } from "framer-motion";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
+
 
 export default function Services() {
   const containerRef = useRef(null);
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(".service-card", {
-        y: 80,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 80%",
-        },
-      });
-    }, containerRef);
-    return () => ctx.revert();
-  }, []);
+  // useEffect(() => {
+  //   const ctx = gsap.context(() => {
+  //     gsap.from(".service-card", {
+  //       y: 80,
+  //       opacity: 0,
+  //       duration: 1,
+  //       stagger: 0.1,
+  //       ease: "power3.out",
+  //       scrollTrigger: {
+  //         trigger: containerRef.current,
+  //         start: "top 80%",
+  //       },
+  //     });
+  //   }, containerRef);
+  //   return () => ctx.revert();
+  // }, []);
+
+
+
+useEffect(() => {
+  const ctx = gsap.context(() => {
+    const cards = gsap.utils.toArray(".service-card");
+
+    cards.forEach((card, i) => {
+      gsap.fromTo(
+        card,
+        { y: 80, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 85%",
+            toggleActions: "play none none none",
+            once: true,
+            // markers: true, // debug করলে দেখবে trigger হচ্ছে কিনা
+          },
+        }
+      );
+    });
+  }, containerRef);
+
+  // 🔥 VERY IMPORTANT (Next.js fix)
+  setTimeout(() => {
+    ScrollTrigger.refresh();
+  }, 100);
+
+  return () => ctx.revert();
+}, []);
+
+
 
   const services = [
     { icon: "web", title: "App Design", desc: "High-performance mobile application interfaces designed for user engagement." },
@@ -72,3 +112,4 @@ export default function Services() {
     </section>
   );
 }
+
